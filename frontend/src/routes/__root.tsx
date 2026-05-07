@@ -5,7 +5,7 @@ import favicon from "@/assets/imgs/logo-icon.png?url";
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
-  component: RootDocument,
+  shellComponent: RootDocument,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -25,15 +25,12 @@ export const Route = createRootRouteWithContext<{
 
 function RootDocument() {
   return (
-    <html lang="pt-BR">
-      <head>
-        <HeadContent />
-      </head>
-      <body className="relative tabular-nums">
+    <>
+      <HeadContent />
+      <div className="relative tabular-nums">
         <Outlet />
-
-        <Scripts />
-      </body>
-    </html>
+      </div>
+      <Scripts />
+    </>
   );
 }
