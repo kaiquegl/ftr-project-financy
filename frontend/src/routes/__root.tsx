@@ -27,7 +27,7 @@ function RootDocument() {
   return (
     <>
       <HeadContent />
-      <div className="relative tabular-nums">
+      <div className="relative bg-gray-100 tabular-nums">
         <Outlet />
       </div>
       <Scripts />
