@@ -1,9 +1,82 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+
+import logo from "@/assets/imgs/logo.png?url";
+import logoIcon from "@/assets/imgs/logo-icon.png?url";
+import { Container } from "@/components/container";
 
 export const Route = createFileRoute("/_dash")({
   component: RouteComponent
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dash"!</div>;
+  return (
+    <div className="flex min-h-dvh flex-col gap-8 md:gap-12">
+      <header className="border-gray-200 border-b bg-white">
+        <Container className="flex items-center justify-between p-4">
+          <Link to="/dashboard">
+            <img
+              alt="Financy Logo"
+              className="hidden h-9 w-32 object-contain md:block"
+              height={32}
+              src={logo}
+              width={128}
+            />
+            <img
+              alt="Financy Logo"
+              className="block size-9 object-contain md:hidden"
+              height={36}
+              src={logoIcon}
+              width={36}
+            />
+          </Link>
+
+          <ul className="flex items-center gap-3 md:gap-5">
+            <li className="flex">
+              <Link
+                activeProps={{ className: "text-brand-base! font-semibold" }}
+                aria-label="Ver Dashboard"
+                className="text-gray-600 text-xs underline-offset-2 hover:text-brand-base hover:underline md:text-sm"
+                to="/dashboard"
+              >
+                Dashboard
+              </Link>
+            </li>
+            <li className="flex">
+              <Link
+                activeProps={{ className: "text-brand-base! font-semibold" }}
+                aria-label="Ver Transações"
+                className="text-gray-600 text-xs underline-offset-2 hover:text-brand-base hover:underline md:text-sm"
+                to="/transactions"
+              >
+                Transações
+              </Link>
+            </li>
+            <li className="flex">
+              <Link
+                activeProps={{ className: "text-brand-base! font-semibold" }}
+                aria-label="Ver Categorias"
+                className="text-gray-600 text-xs underline-offset-2 hover:text-brand-base hover:underline md:text-sm"
+                to="/categories"
+              >
+                Categorias
+              </Link>
+            </li>
+          </ul>
+
+          <Link
+            aria-label="Ver Perfil"
+            className="flex size-9 items-center justify-center rounded-full bg-gray-300 font-medium text-gray-800 text-sm transition-colors hover:bg-gray-400"
+            title="Ver Perfil"
+            to="/profile"
+          >
+            CT
+          </Link>
+        </Container>
+      </header>
+
+      <main className="flex-1">
+        <Outlet />
+      </main>
+    </div>
+  );
 }

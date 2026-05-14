@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as DashRouteRouteImport } from './routes/_dash/route'
-import { Route as DashIndexRouteImport } from './routes/_dash/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as DashTransactionsRouteImport } from './routes/_dash/transactions'
+import { Route as DashProfileRouteImport } from './routes/_dash/profile'
+import { Route as DashDashboardRouteImport } from './routes/_dash/dashboard'
+import { Route as DashCategoriesRouteImport } from './routes/_dash/categories'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -23,11 +26,6 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 const DashRouteRoute = DashRouteRouteImport.update({
   id: '/_dash',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashIndexRoute = DashIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashRouteRoute,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
@@ -39,39 +37,89 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const DashTransactionsRoute = DashTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => DashRouteRoute,
+} as any)
+const DashProfileRoute = DashProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashRouteRoute,
+} as any)
+const DashDashboardRoute = DashDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => DashRouteRoute,
+} as any)
+const DashCategoriesRoute = DashCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => DashRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof DashIndexRoute
+  '/': typeof DashRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/categories': typeof DashCategoriesRoute
+  '/dashboard': typeof DashDashboardRoute
+  '/profile': typeof DashProfileRoute
+  '/transactions': typeof DashTransactionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof DashRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/categories': typeof DashCategoriesRoute
+  '/dashboard': typeof DashDashboardRoute
+  '/profile': typeof DashProfileRoute
+  '/transactions': typeof DashTransactionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/': typeof DashIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_dash': typeof DashRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/_dash/categories': typeof DashCategoriesRoute
+  '/_dash/dashboard': typeof DashDashboardRoute
+  '/_dash/profile': typeof DashProfileRoute
+  '/_dash/transactions': typeof DashTransactionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/_dash/': typeof DashIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/auth/login' | '/auth/register'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/categories'
+    | '/dashboard'
+    | '/profile'
+    | '/transactions'
+    | '/auth/login'
+    | '/auth/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/auth/login' | '/auth/register' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/categories'
+    | '/dashboard'
+    | '/profile'
+    | '/transactions'
+    | '/auth/login'
+    | '/auth/register'
   id:
     | '__root__'
     | '/_dash'
     | '/auth'
+    | '/_dash/categories'
+    | '/_dash/dashboard'
+    | '/_dash/profile'
+    | '/_dash/transactions'
     | '/auth/login'
     | '/auth/register'
-    | '/_dash/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,13 +143,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dash/': {
-      id: '/_dash/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof DashIndexRouteImport
-      parentRoute: typeof DashRouteRoute
-    }
     '/auth/register': {
       id: '/auth/register'
       path: '/register'
@@ -116,15 +157,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_dash/transactions': {
+      id: '/_dash/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof DashTransactionsRouteImport
+      parentRoute: typeof DashRouteRoute
+    }
+    '/_dash/profile': {
+      id: '/_dash/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof DashProfileRouteImport
+      parentRoute: typeof DashRouteRoute
+    }
+    '/_dash/dashboard': {
+      id: '/_dash/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashDashboardRouteImport
+      parentRoute: typeof DashRouteRoute
+    }
+    '/_dash/categories': {
+      id: '/_dash/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof DashCategoriesRouteImport
+      parentRoute: typeof DashRouteRoute
+    }
   }
 }
 
 interface DashRouteRouteChildren {
-  DashIndexRoute: typeof DashIndexRoute
+  DashCategoriesRoute: typeof DashCategoriesRoute
+  DashDashboardRoute: typeof DashDashboardRoute
+  DashProfileRoute: typeof DashProfileRoute
+  DashTransactionsRoute: typeof DashTransactionsRoute
 }
 
 const DashRouteRouteChildren: DashRouteRouteChildren = {
-  DashIndexRoute: DashIndexRoute,
+  DashCategoriesRoute: DashCategoriesRoute,
+  DashDashboardRoute: DashDashboardRoute,
+  DashProfileRoute: DashProfileRoute,
+  DashTransactionsRoute: DashTransactionsRoute,
 }
 
 const DashRouteRouteWithChildren = DashRouteRoute._addFileChildren(
