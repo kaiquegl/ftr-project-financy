@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LogInIcon, Mail, User } from "lucide-react";
+import { LockIcon, LogInIcon, Mail, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -73,6 +73,7 @@ function RouteComponent() {
               autoComplete="new-password"
               control={form.control}
               helperText="A senha deve ter no mínimo 8 caracteres"
+              icon={<LockIcon className="size-4" />}
               label="Senha"
               name="password"
               placeholder="Digite sua senha"

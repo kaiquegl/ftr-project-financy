@@ -83,12 +83,12 @@ function RouteComponent() {
                   </div>
                 )}
               />
-              <Link
+              {/* <Link
                 className="font-medium text-brand-base text-sm underline-offset-2 hover:underline"
                 to="/auth/recover"
               >
                 Recuperar senha
-              </Link>
+              </Link> */}
             </div>
 
             <Button className="w-full" type="submit">
