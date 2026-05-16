@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_dash")({
 });
 
 function RouteComponent() {
+  const { user } = Route.useRouteContext();
+
   return (
     <div className="flex min-h-dvh flex-col gap-8 md:gap-12">
       <header className="border-gray-200 border-b bg-white">
@@ -71,11 +73,15 @@ function RouteComponent() {
 
           <Link
             aria-label="Ver Perfil"
-            className="flex size-9 items-center justify-center rounded-full bg-gray-300 font-medium text-gray-800 text-sm transition-colors hover:bg-gray-400"
+            className="flex size-9 items-center justify-center rounded-full bg-gray-300 font-medium text-gray-800 text-sm uppercase transition-colors hover:bg-gray-400"
             title="Ver Perfil"
             to="/profile"
           >
-            CT
+            {user?.name
+              .split(" ")
+              .map((name, index) => (index <= 1 ? name[0] : null))
+              .filter(Boolean)
+              .join("")}
           </Link>
         </Container>
       </header>

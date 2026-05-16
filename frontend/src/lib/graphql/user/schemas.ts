@@ -29,6 +29,12 @@ const meSchema = z.object({
 
 type Me = z.infer<typeof meSchema>;
 
+const updateUserFormSchema = z.object({
+  fullName: z.string().min(1, "O nome completo é obrigatório").regex(FULL_NAME_PATTERN, "Informe nome e sobrenome")
+});
+
+type UpdateUserForm = z.infer<typeof updateUserFormSchema>;
+
 const userSelectionGQL = gql`
   fragment UserSelection on User {
     id
@@ -46,5 +52,7 @@ export {
   meSchema,
   type RegisterUserForm,
   registerUserFormSchema,
+  type UpdateUserForm,
+  updateUserFormSchema,
   userSelectionGQL
 };

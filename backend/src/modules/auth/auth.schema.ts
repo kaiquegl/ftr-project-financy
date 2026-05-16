@@ -1,21 +1,7 @@
 import { loginMutation } from "./mutations/login";
 import { logoutMutation } from "./mutations/logout";
-import { registerMutation } from "./mutations/register";
+import { registerUserMutation } from "./mutations/register-user";
 import { getMeQuery } from "./queries/get-me";
-
-export type LoginArgs = {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-};
-
-export type RegisterArgs = {
-  input: {
-    email: string;
-    fullName: string;
-    password: string;
-  };
-};
 
 export function mapUserToResponse(user: { createdAt: Date; email: string; id: string; name: string; updatedAt: Date }) {
   return {
@@ -26,6 +12,14 @@ export function mapUserToResponse(user: { createdAt: Date; email: string; id: st
 }
 
 export const authTypeDefs = /* GraphQL */ `
+  type User {
+    id: String!
+    name: String!
+    email: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   type AuthPayload {
     user: User!
   }
@@ -54,6 +48,6 @@ export const authResolvers = {
   Mutation: {
     login: loginMutation,
     logout: logoutMutation,
-    register: registerMutation
+    registerUser: registerUserMutation
   }
 };

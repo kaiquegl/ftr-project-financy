@@ -1,7 +1,13 @@
 import { GraphQLError } from "graphql";
 import { createSessionToken, setSessionCookie, verifyPassword } from "../../../lib/auth";
 import type { GraphqlContext } from "../../../lib/graphql-context";
-import { type LoginArgs, mapUserToResponse } from "../auth.schema";
+import { mapUserToResponse } from "../auth.schema";
+
+type LoginArgs = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
 
 export const loginMutation = async (_: unknown, args: LoginArgs, context: GraphqlContext) => {
   const existingUser = await context.prisma.user.findUnique({
