@@ -1,7 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { graphqlClient } from "@/lib/graphql/client";
-import { type LoginUserForm, type Me, type RegisterUserForm, userSelectionGQL } from "@/lib/graphql/user/schemas";
+import {
+  type LoginUserForm,
+  type Me,
+  type RegisterUserForm,
+  type UpdateUserForm,
+  userSelectionGQL
+} from "@/lib/graphql/user/schemas";
 
 const loginUserGQL = gql`
   ${userSelectionGQL}
@@ -17,7 +23,7 @@ const loginUserGQL = gql`
 const registerUserGQL = gql`
   ${userSelectionGQL}
   mutation RegisterUser($input: RegisterUserForm!) {
-    register(input: $input) {
+    registerUser(input: $input) {
       user {
         ...UserSelection
       }
@@ -28,6 +34,17 @@ const registerUserGQL = gql`
 const logoutUserGQL = gql`
   mutation Logout {
     logout
+  }
+`;
+
+const updateUserGQL = gql`
+  ${userSelectionGQL}
+  mutation UpdateUser($input: UpdateUserForm!) {
+    updateUser(input: $input) {
+      user {
+        ...UserSelection
+      }
+    }
   }
 `;
 
@@ -57,4 +74,14 @@ const logoutUserMutation = () =>
     }
   });
 
-export { loginUserMutation, logoutUserMutation, registerUserMutation };
+const updateUserMutation = () =>
+  useMutation({
+    mutationFn: async (input: UpdateUserForm) => {
+      const response = await graphqlClient.request<{ updateUser: { user: Me } }>(updateUserGQL, {
+        input
+      });
+      return response.updateUser.user;
+    }
+  });
+
+export { loginUserMutation, logoutUserMutation, registerUserMutation, updateUserMutation };

@@ -10,6 +10,10 @@ export const Route = createFileRoute("/_dash")({
     if (!currentUser) {
       throw redirect({ to: "/auth/login" });
     }
+
+    return {
+      user: currentUser
+    };
   },
   component: RouteComponent
 });
@@ -72,6 +76,7 @@ function RouteComponent() {
           </ul>
 
           <Link
+            activeProps={{ className: "bg-brand-base! text-white! font-semibold" }}
             aria-label="Ver Perfil"
             className="flex size-9 items-center justify-center rounded-full bg-gray-300 font-medium text-gray-800 text-sm uppercase transition-colors hover:bg-gray-400"
             title="Ver Perfil"
