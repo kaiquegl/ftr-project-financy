@@ -7,7 +7,6 @@ export const Route = createFileRoute("/auth")({
   component: RouteComponent,
   beforeLoad: async ({ context, location }) => {
     const currentUser = await context.queryClient.ensureQueryData(getMeQueryOptions());
-    console.log("currentUser", currentUser);
     if (currentUser) {
       throw redirect({ to: "/" });
     }

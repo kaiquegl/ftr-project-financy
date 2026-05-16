@@ -1,6 +1,8 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { Lock, Mail, UserPlus } from "lucide-react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormInputController } from "@/components/form/form-input-controller";
@@ -17,9 +19,11 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function RouteComponent() {
-  // const navigate = useNavigate();
-  // const queryClient = useQueryClient();
-  const { mutateAsync: loginUser, isPending: isLoggingIn } = loginUserMutation();
+  const router = useRouter();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { mutateAsync: loginUser } = loginUserMutation();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const form = useForm<LoginUserForm>({
     resolver: standardSchemaResolver(loginUserFormSchema),
@@ -32,9 +36,16 @@ function RouteComponent() {
 
   async function onSubmit(data: LoginUserForm) {
     try {
-      const response = await loginUser(data);
+      setIsLoggingIn(true);
+      const loggedInUser = await loginUser(data);
+      queryClient.setQueryData(["me"], loggedInUser);
+      toast.success("Login realizado com sucesso!", { description: "Você será redirecionado para a página inicial." });
+      await router.invalidate();
+      await navigate({ to: "/" });
     } catch (error) {
       toast.error(getGraphQLErrorMessage(error, "Não foi possível fazer login com os dados informados."));
+    } finally {
+      setIsLoggingIn(false);
     }
   }
 
@@ -93,7 +104,7 @@ function RouteComponent() {
               </Link> */}
             </div>
 
-            <Button className="w-full" disabled={isLoggingIn} type="submit">
+            <Button className="w-full" isLoading={isLoggingIn} type="submit">
               Entrar
             </Button>
           </div>

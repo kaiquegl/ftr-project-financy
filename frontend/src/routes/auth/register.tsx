@@ -1,6 +1,8 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { LockIcon, LogInIcon, Mail, User } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormInputController } from "@/components/form/form-input-controller";
@@ -16,9 +18,11 @@ export const Route = createFileRoute("/auth/register")({
 });
 
 function RouteComponent() {
-  // const navigate = useNavigate();
-  // const queryClient = useQueryClient();
-  const { mutateAsync: registerUser, isPending: isRegistering } = registerUserMutation();
+  const router = useRouter();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isRegistering, setIsRegistering] = useState(false);
+  const { mutateAsync: registerUser } = registerUserMutation();
 
   const form = useForm<RegisterUserForm>({
     resolver: standardSchemaResolver(registerUserFormSchema),
@@ -31,10 +35,15 @@ function RouteComponent() {
 
   async function onSubmit(data: RegisterUserForm) {
     try {
-      const response = await registerUser(data);
-      console.log(response, "User registered successfully");
+      setIsRegistering(true);
+      const registeredUser = await registerUser(data);
+      queryClient.setQueryData(["me"], registeredUser);
+      await router.invalidate();
+      await navigate({ to: "/" });
     } catch (error) {
       toast.error(getGraphQLErrorMessage(error, "Não foi possível concluir o cadastro."));
+    } finally {
+      setIsRegistering(false);
     }
   }
 
@@ -81,7 +90,7 @@ function RouteComponent() {
               type="password"
             />
 
-            <Button className="w-full" disabled={isRegistering} type="submit">
+            <Button className="w-full" isLoading={isRegistering} type="submit">
               Cadastrar
             </Button>
           </div>
