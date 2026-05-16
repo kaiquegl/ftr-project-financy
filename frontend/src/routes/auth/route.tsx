@@ -1,12 +1,17 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-
 import logo from "@/assets/imgs/logo.png?url";
 import { Card } from "@/components/ui/card";
+import { getMeQueryOptions } from "@/lib/graphql/user/queries";
 
 export const Route = createFileRoute("/auth")({
   component: RouteComponent,
-  beforeLoad: ({ location }) => {
-    console.log("beforeLoad", location);
+  beforeLoad: async ({ context, location }) => {
+    const currentUser = await context.queryClient.ensureQueryData(getMeQueryOptions());
+    console.log("currentUser", currentUser);
+    if (currentUser) {
+      throw redirect({ to: "/" });
+    }
+
     if (location.pathname === "/auth" || location.pathname === "/auth/") {
       throw redirect({ to: "/auth/login" });
     }

@@ -1,3 +1,9 @@
+import { createCategoryMutation } from "./mutations/create";
+import { deleteCategoryMutation } from "./mutations/delete";
+import { updateCategoryMutation } from "./mutations/update";
+import { getAllCategoriesQuery } from "./queries/get-all";
+import { getCategoryByIdQuery } from "./queries/get-by-id";
+
 export const categoryTypeDefs = /* GraphQL */ `
   type Category {
     id: String!
@@ -20,18 +26,12 @@ export const categoryTypeDefs = /* GraphQL */ `
 
 export const categoryResolvers = {
   Query: {
-    categories: () => [],
-    category: () => null
+    categories: getAllCategoriesQuery,
+    category: getCategoryByIdQuery
   },
   Mutation: {
-    createCategory: () => {
-      throw new Error("Not implemented");
-    },
-    updateCategory: () => {
-      throw new Error("Not implemented");
-    },
-    deleteCategory: () => {
-      throw new Error("Not implemented");
-    }
+    createCategory: createCategoryMutation,
+    updateCategory: updateCategoryMutation,
+    deleteCategory: deleteCategoryMutation
   }
 };

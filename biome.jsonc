@@ -6,6 +6,7 @@
     "ultracite/biome/remix"
   ],
   "javascript": {
+    "globals": ["Bun"],
     "formatter": {
       "enabled": true,
       "lineWidth": 120,

@@ -2,30 +2,26 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LockIcon, LogInIcon, Mail, User } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
+import { toast } from "sonner";
 import { FormInputController } from "@/components/form/form-input-controller";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-const FULL_NAME_PATTERN = /^[^\s]+(\s+[^\s]+)+$/;
-
-const registerSchema = z.object({
-  fullName: z.string().min(1, "O nome completo é obrigatório").regex(FULL_NAME_PATTERN, "Informe nome e sobrenome"),
-  email: z.email("Digite um e-mail válido"),
-  password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres")
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { getGraphQLErrorMessage } from "@/lib/graphql/errors";
+import { registerUserMutation } from "@/lib/graphql/user/mutations";
+import { type RegisterUserForm, registerUserFormSchema } from "@/lib/graphql/user/schemas";
 
 export const Route = createFileRoute("/auth/register")({
   component: RouteComponent
 });
 
 function RouteComponent() {
-  const form = useForm<RegisterFormValues>({
-    resolver: standardSchemaResolver(registerSchema),
+  // const navigate = useNavigate();
+  // const queryClient = useQueryClient();
+  const { mutateAsync: registerUser, isPending: isRegistering } = registerUserMutation();
+
+  const form = useForm<RegisterUserForm>({
+    resolver: standardSchemaResolver(registerUserFormSchema),
     defaultValues: {
       fullName: "",
       email: "",
@@ -33,8 +29,13 @@ function RouteComponent() {
     }
   });
 
-  function onSubmit(data: RegisterFormValues) {
-    console.log(data);
+  async function onSubmit(data: RegisterUserForm) {
+    try {
+      const response = await registerUser(data);
+      console.log(response, "User registered successfully");
+    } catch (error) {
+      toast.error(getGraphQLErrorMessage(error, "Não foi possível concluir o cadastro."));
+    }
   }
 
   return (
@@ -80,7 +81,7 @@ function RouteComponent() {
               type="password"
             />
 
-            <Button className="w-full" type="submit">
+            <Button className="w-full" disabled={isRegistering} type="submit">
               Cadastrar
             </Button>
           </div>
@@ -99,6 +100,7 @@ function RouteComponent() {
           <p className="text-muted-foreground text-sm">Já tem uma conta?</p>
           <Button
             className="w-full gap-2"
+            nativeButton={false}
             render={
               <Link to="/auth/login">
                 <LogInIcon className="size-4.5" />

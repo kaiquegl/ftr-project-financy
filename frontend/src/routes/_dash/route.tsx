@@ -1,10 +1,16 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import logo from "@/assets/imgs/logo.png?url";
 import logoIcon from "@/assets/imgs/logo-icon.png?url";
 import { Container } from "@/components/container";
+import { getMeQueryOptions } from "@/lib/graphql/user/queries";
 
 export const Route = createFileRoute("/_dash")({
+  beforeLoad: async ({ context }) => {
+    const currentUser = await context.queryClient.ensureQueryData(getMeQueryOptions());
+    if (!currentUser) {
+      throw redirect({ to: "/auth/login" });
+    }
+  },
   component: RouteComponent
 });
 
@@ -13,7 +19,7 @@ function RouteComponent() {
     <div className="flex min-h-dvh flex-col gap-8 md:gap-12">
       <header className="border-gray-200 border-b bg-white">
         <Container className="flex items-center justify-between p-4">
-          <Link to="/dashboard">
+          <Link to="/">
             <img
               alt="Financy Logo"
               className="hidden h-9 w-32 object-contain md:block"
@@ -36,7 +42,7 @@ function RouteComponent() {
                 activeProps={{ className: "text-brand-base! font-semibold" }}
                 aria-label="Ver Dashboard"
                 className="text-gray-600 text-xs underline-offset-2 hover:text-brand-base hover:underline md:text-sm"
-                to="/dashboard"
+                to="/"
               >
                 Dashboard
               </Link>

@@ -1,0 +1,44 @@
+---
+description: Environment and package manager standards for this project
+alwaysApply: true
+---
+
+# Environment and Tooling Rules
+
+- Backend baseline (`/backend`):
+  - Runtime and package manager: use `bun` only.
+  - Never use `npm` commands inside backend.
+  - Main stack: Elysia + GraphQL Yoga + Prisma (SQLite/libsql adapter).
+  - Main entrypoint: `backend/src/index.ts`.
+  - Default API endpoint: `http://localhost:3000/graphql`.
+  - Common commands:
+    - `bun run dev`
+    - `bun run start`
+    - `bun run db:generate`
+    - `bun run db:migrate`
+    - `bun run db:studio`
+
+- Frontend baseline (`/frontend`):
+  - Package manager: use `pnpm` only.
+  - Never use `npm` commands inside frontend.
+  - Main stack: React + Vite + TanStack Router + TanStack Query.
+  - GraphQL client pattern: `graphql-request` with `credentials: "include"`.
+  - Common commands:
+    - `pnpm dev`
+    - `pnpm build`
+    - `pnpm typecheck`
+    - `pnpm preview`
+
+- Front/back integration basics:
+  - Authentication is cookie-based (HttpOnly session cookie).
+  - Frontend requests to GraphQL must include credentials.
+  - Backend CORS must keep `credentials: true` and a valid `FRONTEND_URL` origin.
+
+- Scope and consistency:
+  - Preserve existing frontend form field contracts as source of truth.
+  - Avoid adding unrelated architecture changes unless explicitly requested.
+
+- Tests policy:
+  - Do not create tests.
+  - Do not run tests.
+  - Only create or run tests when the user explicitly asks.

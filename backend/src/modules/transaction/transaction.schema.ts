@@ -1,3 +1,9 @@
+import { createTransactionMutation } from "./mutations/create";
+import { deleteTransactionMutation } from "./mutations/delete";
+import { updateTransactionMutation } from "./mutations/update";
+import { getAllTransactionsQuery } from "./queries/get-all";
+import { getTransactionByIdQuery } from "./queries/get-by-id";
+
 export const transactionTypeDefs = /* GraphQL */ `
   type Transaction {
     id: String!
@@ -19,18 +25,12 @@ export const transactionTypeDefs = /* GraphQL */ `
 
 export const transactionResolvers = {
   Query: {
-    transactions: () => [],
-    transaction: () => null
+    transactions: getAllTransactionsQuery,
+    transaction: getTransactionByIdQuery
   },
   Mutation: {
-    createTransaction: () => {
-      throw new Error("Not implemented");
-    },
-    updateTransaction: () => {
-      throw new Error("Not implemented");
-    },
-    deleteTransaction: () => {
-      throw new Error("Not implemented");
-    }
+    createTransaction: createTransactionMutation,
+    updateTransaction: updateTransactionMutation,
+    deleteTransaction: deleteTransactionMutation
   }
 };

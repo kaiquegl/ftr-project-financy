@@ -2,29 +2,27 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Lock, Mail, UserPlus } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-
+import { toast } from "sonner";
 import { FormInputController } from "@/components/form/form-input-controller";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-
-const loginSchema = z.object({
-  email: z.email("Digite um e-mail válido"),
-  password: z.string().min(1, "A senha é obrigatória"),
-  rememberMe: z.boolean()
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { getGraphQLErrorMessage } from "@/lib/graphql/errors";
+import { loginUserMutation } from "@/lib/graphql/user/mutations";
+import { type LoginUserForm, loginUserFormSchema } from "@/lib/graphql/user/schemas";
 
 export const Route = createFileRoute("/auth/login")({
   component: RouteComponent
 });
 
 function RouteComponent() {
-  const form = useForm<LoginFormValues>({
-    resolver: standardSchemaResolver(loginSchema),
+  // const navigate = useNavigate();
+  // const queryClient = useQueryClient();
+  const { mutateAsync: loginUser, isPending: isLoggingIn } = loginUserMutation();
+
+  const form = useForm<LoginUserForm>({
+    resolver: standardSchemaResolver(loginUserFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -32,8 +30,12 @@ function RouteComponent() {
     }
   });
 
-  function onSubmit(data: LoginFormValues) {
-    console.log(data);
+  async function onSubmit(data: LoginUserForm) {
+    try {
+      const response = await loginUser(data);
+    } catch (error) {
+      toast.error(getGraphQLErrorMessage(error, "Não foi possível fazer login com os dados informados."));
+    }
   }
 
   return (
@@ -91,7 +93,7 @@ function RouteComponent() {
               </Link> */}
             </div>
 
-            <Button className="w-full" type="submit">
+            <Button className="w-full" disabled={isLoggingIn} type="submit">
               Entrar
             </Button>
           </div>
@@ -110,6 +112,7 @@ function RouteComponent() {
           <p className="text-muted-foreground text-sm">Ainda não tem uma conta?</p>
           <Button
             className="w-full gap-2"
+            nativeButton={false}
             render={
               <Link to="/auth/register">
                 <UserPlus className="size-4.5" />

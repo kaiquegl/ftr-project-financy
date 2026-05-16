@@ -1,9 +1,11 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import favicon from "@/assets/imgs/logo-icon.png?url";
+import type { Me } from "@/lib/graphql/user/schemas";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
+  user: Me | null;
 }>()({
   shellComponent: RootDocument,
   head: () => ({

@@ -12,6 +12,7 @@ export const typeDefs = [baseTypeDefs, userTypeDefs, authTypeDefs, transactionTy
 
 export const resolvers = {
   Query: {
+    ...authResolvers.Query,
     ...userResolvers.Query,
     ...transactionResolvers.Query,
     ...categoryResolvers.Query
