@@ -1,11 +1,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import z from "zod";
 import { Container } from "@/components/container";
 import { TransactionsDataTable } from "@/components/pages/transactions/data-table";
+import { TransactionsModal } from "@/components/pages/transactions/modal";
 import { Button } from "@/components/ui/button";
 import { getTransactionsQueryOptions } from "@/lib/graphql/transactions/queries";
+import type { TransactionItem } from "@/lib/graphql/transactions/schemas";
 
 export const Route = createFileRoute("/_dash/transactions")({
   component: RouteComponent,
@@ -23,6 +26,25 @@ function RouteComponent() {
   const { page } = Route.useSearch();
   const currentPage = page ?? 1;
   const { data: transactions } = useSuspenseQuery(getTransactionsQueryOptions({ page: currentPage, perPage: 10 }));
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionItem | undefined>(undefined);
+
+  function onOpenCreateTransactionModal() {
+    setSelectedTransaction(undefined);
+    setIsTransactionModalOpen(true);
+  }
+
+  function onOpenEditTransactionModal(transaction: TransactionItem) {
+    setSelectedTransaction(transaction);
+    setIsTransactionModalOpen(true);
+  }
+
+  function onTransactionModalOpenChange(open: boolean) {
+    setIsTransactionModalOpen(open);
+    if (!open) {
+      setSelectedTransaction(undefined);
+    }
+  }
 
   function onPageChange(nextPage: number) {
     navigate({
@@ -44,13 +66,23 @@ function RouteComponent() {
             </h2>
           </div>
 
-          <Button className="leading-snug" size="sm">
+          <Button className="leading-snug" onClick={onOpenCreateTransactionModal} size="sm">
             <PlusIcon /> Nova transação
           </Button>
         </div>
 
-        <TransactionsDataTable data={transactions} onPageChange={onPageChange} />
+        <TransactionsDataTable
+          data={transactions}
+          onEditTransaction={onOpenEditTransactionModal}
+          onPageChange={onPageChange}
+        />
       </Container>
+
+      <TransactionsModal
+        open={isTransactionModalOpen}
+        setOpen={onTransactionModalOpenChange}
+        transaction={selectedTransaction}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import { Fragment } from "react";
-import { transactionsColumns } from "@/components/pages/transactions/columns";
+import { getTransactionsColumns } from "@/components/pages/transactions/columns";
 import {
   Pagination,
   PaginationContent,
@@ -11,10 +11,11 @@ import {
   PaginationPrevious
 } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { TransactionsPage } from "@/lib/graphql/transactions/schemas";
+import type { TransactionItem, TransactionsPage } from "@/lib/graphql/transactions/schemas";
 
 type TransactionsDataTableProps = {
   data: TransactionsPage;
+  onEditTransaction: (transaction: TransactionItem) => void;
   onPageChange: (page: number) => void;
 };
 
@@ -23,7 +24,7 @@ function getVisiblePages(currentPage: number, totalPages: number): number[] {
   return [...pagesToRender].filter((page) => page >= 1 && page <= totalPages).sort((pageA, pageB) => pageA - pageB);
 }
 
-export function TransactionsDataTable({ data, onPageChange }: TransactionsDataTableProps) {
+export function TransactionsDataTable({ data, onEditTransaction, onPageChange }: TransactionsDataTableProps) {
   const totalItems = data.totalItems;
   const currentPage = Math.max(1, Math.min(data.page, Math.max(1, data.totalPages)));
   const visiblePages = getVisiblePages(currentPage, Math.max(1, data.totalPages));
@@ -31,6 +32,7 @@ export function TransactionsDataTable({ data, onPageChange }: TransactionsDataTa
   const endItem = totalItems > 0 ? Math.min(currentPage * data.perPage, totalItems) : 0;
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < data.totalPages;
+  const transactionsColumns = getTransactionsColumns({ onEditTransaction });
 
   const table = useReactTable({
     data: data.items,
