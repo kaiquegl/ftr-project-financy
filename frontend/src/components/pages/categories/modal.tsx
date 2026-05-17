@@ -68,7 +68,17 @@ export function CategoriesModal({ category, open, setOpen }: CategoriesModalProp
         await createCategory(values);
       }
 
-      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+      const queryKeysToInvalidate = category?.id
+        ? ([["categories"], ["transactions"], ["dashboard"]] as const)
+        : ([["categories"]] as const);
+
+      await Promise.all(
+        queryKeysToInvalidate.map((queryKey) =>
+          queryClient.invalidateQueries({
+            queryKey
+          })
+        )
+      );
       toast.success(category?.id ? "Categoria atualizada com sucesso." : "Categoria criada com sucesso.");
       onOpenChange(false);
     } catch (error) {

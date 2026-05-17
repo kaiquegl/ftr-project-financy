@@ -26,7 +26,7 @@ export function DashboardCardHeader({ title, amount, icon: Icon, tone }: Dashboa
           <Icon className={cn("size-5", toneClasses[tone])} />
           <span className="font-medium text-gray-500 text-xs uppercase leading-tight tracking-[0.12em]">{title}</span>
         </div>
-        <p className="font-bold text-gray-800 text-xl leading-tight md:text-3xl">{formatCurrencyToBr(amount)}</p>
+        <p className="font-bold text-gray-800 text-xl leading-tight lg:text-3xl">{formatCurrencyToBr(amount)}</p>
       </CardContent>
     </Card>
   );
