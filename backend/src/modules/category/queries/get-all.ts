@@ -9,6 +9,13 @@ export const getAllCategoriesQuery = async (_: unknown, __: unknown, context: Gr
     where: {
       userId: authenticatedUser.id
     },
+    include: {
+      _count: {
+        select: {
+          transactions: true
+        }
+      }
+    },
     orderBy: {
       createdAt: "desc"
     }

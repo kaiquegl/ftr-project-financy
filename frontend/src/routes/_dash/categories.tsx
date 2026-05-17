@@ -1,11 +1,15 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpDownIcon, TagIcon } from "lucide-react";
+import { ArrowUpDownIcon, PlusIcon, TagIcon } from "lucide-react";
+import { useState } from "react";
 import { Container } from "@/components/container";
 import { CategoriesCardHeader } from "@/components/pages/categories/card-header";
+import { CategoriesCardItem } from "@/components/pages/categories/card-item";
+import { CategoriesModal } from "@/components/pages/categories/modal";
 import { Button } from "@/components/ui/button";
 import { getCategoryIconByToken, getCategoryIconColorClass } from "@/lib/graphql/categories/helpers";
 import { getAllCategoriesQueryOptions, getCategoriesOverviewQueryOptions } from "@/lib/graphql/categories/queries";
+import type { CategoryItem } from "@/lib/graphql/categories/schemas";
 
 export const Route = createFileRoute("/_dash/categories")({
   component: RouteComponent,
@@ -18,11 +22,30 @@ export const Route = createFileRoute("/_dash/categories")({
 });
 
 function RouteComponent() {
-  useSuspenseQuery(getAllCategoriesQueryOptions());
+  const { data: categories } = useSuspenseQuery(getAllCategoriesQueryOptions());
   const { data: categoriesOverview } = useSuspenseQuery(getCategoriesOverviewQueryOptions());
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryItem | undefined>(undefined);
   const mostUsedCategory = categoriesOverview?.mostUsedCategory;
   const MostUsedCategoryIcon = getCategoryIconByToken(mostUsedCategory?.icon);
   const mostUsedCategoryIconColorClass = getCategoryIconColorClass(mostUsedCategory?.color);
+
+  function onOpenCreateCategoryModal() {
+    setSelectedCategory(undefined);
+    setIsCategoryModalOpen(true);
+  }
+
+  function onOpenEditCategoryModal(category: CategoryItem) {
+    setSelectedCategory(category);
+    setIsCategoryModalOpen(true);
+  }
+
+  function onCategoryModalOpenChange(open: boolean) {
+    setIsCategoryModalOpen(open);
+    if (!open) {
+      setSelectedCategory(undefined);
+    }
+  }
 
   return (
     <div>
@@ -33,7 +56,9 @@ function RouteComponent() {
             <h2 className="font-normal text-gray-600 text-sm md:text-base">Organize suas transações por categorias</h2>
           </div>
 
-          <Button size="sm">+ Nova categoria</Button>
+          <Button className="leading-snug" onClick={onOpenCreateCategoryModal} size="sm">
+            <PlusIcon /> Nova categoria
+          </Button>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3 md:gap-6">
@@ -53,7 +78,15 @@ function RouteComponent() {
             title={mostUsedCategory?.title ?? "Nenhuma"}
           />
         </div>
+
+        <div className="grid gap-3 md:grid-cols-4 md:gap-4">
+          {categories.map((category) => (
+            <CategoriesCardItem category={category} key={category.id} onEdit={onOpenEditCategoryModal} />
+          ))}
+        </div>
       </Container>
+
+      <CategoriesModal category={selectedCategory} open={isCategoryModalOpen} setOpen={onCategoryModalOpenChange} />
     </div>
   );
 }

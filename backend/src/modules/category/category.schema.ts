@@ -13,11 +13,15 @@ type CategoryEntity = {
   color: string;
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    transactions: number;
+  };
 };
 
 export function mapCategoryToResponse(category: CategoryEntity) {
   return {
     ...category,
+    transactionsCount: category._count?.transactions ?? null,
     createdAt: category.createdAt.toISOString(),
     updatedAt: category.updatedAt.toISOString()
   };
@@ -30,6 +34,7 @@ export const categoryTypeDefs = /* GraphQL */ `
     description: String
     icon: String!
     color: String!
+    transactionsCount: Int
     createdAt: String!
     updatedAt: String!
   }

@@ -19,6 +19,27 @@ import {
   UtensilsIcon
 } from "lucide-react";
 
+const CATEGORY_ICON_TOKENS = [
+  "briefcase-business",
+  "car-front",
+  "heart-pulse",
+  "piggy-bank",
+  "shopping-cart",
+  "ticket",
+  "tool-case",
+  "utensils",
+  "paw-print",
+  "house",
+  "gift",
+  "dumbbell",
+  "book-open",
+  "baggage-claim",
+  "mailbox",
+  "receipt-text"
+] as const;
+
+const CATEGORY_COLOR_TOKENS = ["green", "blue", "purple", "pink", "red", "orange", "yellow"] as const;
+
 const ICON_BY_TOKEN: Record<string, LucideIcon> = {
   "briefcase-business": BriefcaseBusinessIcon,
   "car-front": CarFrontIcon,
@@ -68,7 +89,7 @@ const NAME_COLOR_CLASS_BY_TOKEN: Record<string, string> = {
   yellow: "text-yellow-dark"
 };
 
-export function getCategoryIconByToken(iconToken?: string | null): LucideIcon {
+function getCategoryIconByToken(iconToken?: string | null): LucideIcon {
   if (!iconToken) {
     return BadgeXIcon;
   }
@@ -76,7 +97,7 @@ export function getCategoryIconByToken(iconToken?: string | null): LucideIcon {
   return ICON_BY_TOKEN[iconToken] ?? BadgeXIcon;
 }
 
-export function getCategoryIconColorClass(colorToken?: string | null): string {
+function getCategoryIconColorClass(colorToken?: string | null): string {
   if (!colorToken) {
     return "text-red-base";
   }
@@ -84,7 +105,7 @@ export function getCategoryIconColorClass(colorToken?: string | null): string {
   return ICON_COLOR_CLASS_BY_TOKEN[colorToken] ?? "text-red-base";
 }
 
-export function getCategoryBgClass(colorToken?: string | null): string {
+function getCategoryBgClass(colorToken?: string | null): string {
   if (!colorToken) {
     return "bg-red-light";
   }
@@ -92,10 +113,19 @@ export function getCategoryBgClass(colorToken?: string | null): string {
   return BG_CLASS_BY_TOKEN[colorToken] ?? "bg-red-light";
 }
 
-export function getCategoryNameColorClass(colorToken?: string | null): string {
+function getCategoryNameColorClass(colorToken?: string | null): string {
   if (!colorToken) {
     return "text-red-dark";
   }
 
   return NAME_COLOR_CLASS_BY_TOKEN[colorToken] ?? "text-red-dark";
 }
+
+export {
+  CATEGORY_COLOR_TOKENS,
+  CATEGORY_ICON_TOKENS,
+  getCategoryBgClass,
+  getCategoryIconByToken,
+  getCategoryIconColorClass,
+  getCategoryNameColorClass
+};

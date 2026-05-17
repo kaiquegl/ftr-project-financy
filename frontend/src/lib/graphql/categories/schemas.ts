@@ -7,6 +7,7 @@ const categoryItemSchema = z.object({
   description: z.string().nullable(),
   icon: z.string(),
   color: z.string(),
+  transactionsCount: z.number().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -57,6 +58,7 @@ const categorySelectionGQL = gql`
     description
     icon
     color
+    transactionsCount
     createdAt
     updatedAt
   }
