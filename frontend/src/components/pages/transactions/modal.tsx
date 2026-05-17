@@ -137,7 +137,11 @@ export function TransactionsModal({ open, setOpen, transaction }: TransactionsMo
         await createTransaction(values);
       }
 
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+        queryClient.invalidateQueries({ queryKey: ["categories"] })
+      ]);
       toast.success(transaction?.id ? "Transação atualizada com sucesso." : "Transação criada com sucesso.");
       onOpenChange(false);
     } catch (error) {
