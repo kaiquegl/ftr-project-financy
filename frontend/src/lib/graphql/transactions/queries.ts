@@ -6,10 +6,12 @@ import {
   type TransactionCategoryOption,
   type TransactionFiltersInput,
   type TransactionItem,
+  type TransactionPeriodOption,
   type TransactionsPage,
   transactionCategoryOptionSchema,
   transactionCategoryOptionSelectionGQL,
   transactionItemSchema,
+  transactionPeriodOptionSchema,
   transactionSelectionGQL,
   transactionsPageSchema
 } from "@/lib/graphql/transactions/schemas";
@@ -52,6 +54,21 @@ const getTransactionCategoriesOptionsGQL = gql`
     categories {
       ...TransactionCategoryOptionSelection
     }
+  }
+`;
+
+const getTransactionCategoriesWithTransactionsOptionsGQL = gql`
+  ${transactionCategoryOptionSelectionGQL}
+  query GetTransactionCategoriesWithTransactionsOptions {
+    categories(onlyWithTransactions: true) {
+      ...TransactionCategoryOptionSelection
+    }
+  }
+`;
+
+const getTransactionPeriodsOptionsGQL = gql`
+  query GetTransactionPeriodsOptions {
+    transactionPeriods
   }
 `;
 
@@ -143,6 +160,38 @@ async function fetchTransactionCategoriesOptions(): Promise<TransactionCategoryO
   }
 }
 
+async function fetchTransactionCategoriesWithTransactionsOptions(): Promise<TransactionCategoryOption[]> {
+  try {
+    const response = await graphqlClient.request<{ categories: TransactionCategoryOption[] }>(
+      getTransactionCategoriesWithTransactionsOptionsGQL
+    );
+
+    return transactionCategoryOptionSchema.array().parse(response.categories);
+  } catch (error) {
+    if (isUnauthenticatedError(error)) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+async function fetchTransactionPeriodsOptions(): Promise<TransactionPeriodOption[]> {
+  try {
+    const response = await graphqlClient.request<{ transactionPeriods: TransactionPeriodOption[] }>(
+      getTransactionPeriodsOptionsGQL
+    );
+
+    return transactionPeriodOptionSchema.array().parse(response.transactionPeriods);
+  } catch (error) {
+    if (isUnauthenticatedError(error)) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
 function getTransactionsQueryOptions(input: GetTransactionsInput = {}) {
   const normalizedFilters = normalizeFilters(input.filters);
   const normalizedInput = {
@@ -177,9 +226,29 @@ function getTransactionCategoriesOptionsQueryOptions() {
   });
 }
 
+function getTransactionCategoriesWithTransactionsOptionsQueryOptions() {
+  return queryOptions({
+    queryKey: ["transactions", "categories-options", "with-transactions"],
+    queryFn: fetchTransactionCategoriesWithTransactionsOptions,
+    staleTime: 60 * 1000 * 10,
+    retry: (failureCount, error) => !isUnauthenticatedError(error) && failureCount < 2
+  });
+}
+
+function getTransactionPeriodsOptionsQueryOptions() {
+  return queryOptions({
+    queryKey: ["transactions", "periods-options"],
+    queryFn: fetchTransactionPeriodsOptions,
+    staleTime: 60 * 1000 * 10,
+    retry: (failureCount, error) => !isUnauthenticatedError(error) && failureCount < 2
+  });
+}
+
 export {
   type GetTransactionsInput,
   getTransactionByIdQueryOptions,
   getTransactionCategoriesOptionsQueryOptions,
+  getTransactionCategoriesWithTransactionsOptionsQueryOptions,
+  getTransactionPeriodsOptionsQueryOptions,
   getTransactionsQueryOptions
 };

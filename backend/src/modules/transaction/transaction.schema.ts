@@ -4,6 +4,7 @@ import { deleteTransactionMutation } from "./mutations/delete";
 import { updateTransactionMutation } from "./mutations/update";
 import { getAllTransactionsQuery } from "./queries/get-all";
 import { getTransactionByIdQuery } from "./queries/get-by-id";
+import { getTransactionPeriodsQuery } from "./queries/get-period-options";
 
 type CategoryEntity = {
   id: string;
@@ -90,6 +91,7 @@ export const transactionTypeDefs = /* GraphQL */ `
   extend type Query {
     transactions(page: Int, perPage: Int, filters: TransactionFiltersInput): TransactionsPage!
     transaction(id: String!): Transaction
+    transactionPeriods: [String!]!
   }
 
   extend type Mutation {
@@ -102,7 +104,8 @@ export const transactionTypeDefs = /* GraphQL */ `
 export const transactionResolvers = {
   Query: {
     transactions: getAllTransactionsQuery,
-    transaction: getTransactionByIdQuery
+    transaction: getTransactionByIdQuery,
+    transactionPeriods: getTransactionPeriodsQuery
   },
   Mutation: {
     createTransaction: createTransactionMutation,

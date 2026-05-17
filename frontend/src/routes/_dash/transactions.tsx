@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { Container } from "@/components/container";
 import { TransactionsDataTable } from "@/components/pages/transactions/data-table";
+import { TransactionsFiltersForm, type TransactionsFiltersFormValues } from "@/components/pages/transactions/form";
 import { TransactionsModal } from "@/components/pages/transactions/modal";
 import { Button } from "@/components/ui/button";
 import { getGraphQLErrorMessage } from "@/lib/graphql/errors";
@@ -16,23 +17,64 @@ import type { TransactionItem } from "@/lib/graphql/transactions/schemas";
 export const Route = createFileRoute("/_dash/transactions")({
   component: RouteComponent,
   validateSearch: z.object({
-    page: z.coerce.number().optional()
+    page: z.coerce.number().int().min(1).optional(),
+    description: z.string().optional(),
+    type: z.enum(["EXPENSE", "INCOME"]).optional(),
+    categoryId: z.string().optional(),
+    period: z
+      .string()
+      .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+      .optional()
   }),
-  loaderDeps: ({ search: { page } }) => ({ page }),
-  loader: async ({ context, deps: { page } }) => {
-    await context.queryClient.ensureQueryData(getTransactionsQueryOptions({ page, perPage: 10 }));
+  loaderDeps: ({ search }) => ({
+    page: search.page,
+    description: search.description,
+    type: search.type,
+    categoryId: search.categoryId,
+    period: search.period
+  }),
+  loader: async ({ context, deps }) => {
+    await context.queryClient.ensureQueryData(
+      getTransactionsQueryOptions({
+        page: deps.page,
+        perPage: 10,
+        filters: {
+          description: deps.description,
+          type: deps.type,
+          categoryId: deps.categoryId,
+          period: deps.period
+        }
+      })
+    );
   }
 });
 
 function RouteComponent() {
   const queryClient = useQueryClient();
   const navigate = Route.useNavigate();
-  const { page } = Route.useSearch();
+  const { page, categoryId, description, period, type } = Route.useSearch();
   const currentPage = page ?? 1;
-  const { data: transactions } = useSuspenseQuery(getTransactionsQueryOptions({ page: currentPage, perPage: 10 }));
+  const { data: transactions } = useSuspenseQuery(
+    getTransactionsQueryOptions({
+      page: currentPage,
+      perPage: 10,
+      filters: {
+        description,
+        type,
+        categoryId,
+        period
+      }
+    })
+  );
   const { mutateAsync: deleteTransaction, isPending: isDeletingTransaction } = deleteTransactionMutation();
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionItem | undefined>(undefined);
+  const currentFilters: TransactionsFiltersFormValues = {
+    description: description ?? "",
+    type: type ?? "ALL",
+    categoryId: categoryId ?? "",
+    period: period ?? ""
+  };
 
   function onOpenCreateTransactionModal() {
     setSelectedTransaction(undefined);
@@ -56,6 +98,19 @@ function RouteComponent() {
       search: (previousSearch) => ({
         ...previousSearch,
         page: nextPage > 1 ? nextPage : undefined
+      })
+    });
+  }
+
+  function onFiltersChange(filters: TransactionsFiltersFormValues) {
+    navigate({
+      search: (previousSearch) => ({
+        ...previousSearch,
+        page: undefined,
+        description: filters.description || undefined,
+        type: filters.type === "ALL" ? undefined : filters.type,
+        categoryId: filters.categoryId || undefined,
+        period: filters.period || undefined
       })
     });
   }
@@ -89,6 +144,8 @@ function RouteComponent() {
             <PlusIcon /> Nova transação
           </Button>
         </div>
+
+        <TransactionsFiltersForm filters={currentFilters} onChange={onFiltersChange} />
 
         <TransactionsDataTable
           data={transactions}

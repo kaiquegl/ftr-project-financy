@@ -7,6 +7,10 @@ const transactionTypeSchema = z.enum(["EXPENSE", "INCOME"]);
 
 type TransactionType = z.infer<typeof transactionTypeSchema>;
 
+const transactionPeriodOptionSchema = z.string().regex(periodPattern, "O periodo deve estar no formato AAAA-MM.");
+
+type TransactionPeriodOption = z.infer<typeof transactionPeriodOptionSchema>;
+
 const transactionCategoryOptionSchema = z.object({
   id: z.string(),
   title: z.string()
@@ -136,6 +140,7 @@ export {
   type TransactionCategoryOption,
   type TransactionFiltersInput,
   type TransactionItem,
+  type TransactionPeriodOption,
   type TransactionsPage,
   type TransactionType,
   transactionCategoryOptionSchema,
@@ -143,6 +148,7 @@ export {
   transactionCategorySchema,
   transactionFiltersInputSchema,
   transactionItemSchema,
+  transactionPeriodOptionSchema,
   transactionSelectionGQL,
   transactionsPageSchema,
   transactionTypeSchema,

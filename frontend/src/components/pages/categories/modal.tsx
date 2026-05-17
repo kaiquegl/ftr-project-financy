@@ -69,8 +69,8 @@ export function CategoriesModal({ category, open, setOpen }: CategoriesModalProp
       }
 
       const queryKeysToInvalidate = category?.id
-        ? ([["categories"], ["transactions"], ["dashboard"]] as const)
-        : ([["categories"]] as const);
+        ? ([["categories"], ["transactions"], ["transactions", "categories-options"], ["dashboard"]] as const)
+        : ([["categories"], ["transactions", "categories-options"]] as const);
 
       await Promise.all(
         queryKeysToInvalidate.map((queryKey) =>

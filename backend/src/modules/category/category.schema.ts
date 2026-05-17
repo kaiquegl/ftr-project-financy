@@ -60,7 +60,7 @@ export const categoryTypeDefs = /* GraphQL */ `
   }
 
   extend type Query {
-    categories: [Category!]!
+    categories(onlyWithTransactions: Boolean = false): [Category!]!
     category(id: String!): Category
     categoriesOverview: CategoriesOverview!
   }
