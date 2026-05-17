@@ -50,6 +50,10 @@ Entregar uma solução full stack para autenticação de usuários e gerenciamen
 - Tailwind CSS
 - Base UI / Shadcn UI
 
+## Referência de layout (Figma)
+
+- Projeto de referência para validação visual e comparação de telas: [Financy no Figma](https://www.figma.com/community/file/1580994817007013257)
+
 ## Como rodar o projeto
 
 ### Pré-requisitos
