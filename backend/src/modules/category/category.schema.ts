@@ -60,9 +60,9 @@ export const categoryTypeDefs = /* GraphQL */ `
   }
 
   extend type Query {
-    getAllCategories: [Category!]!
-    getCategoryById(id: String!): Category
-    getCategoriesOverview: CategoriesOverview!
+    categories: [Category!]!
+    category(id: String!): Category
+    categoriesOverview: CategoriesOverview!
   }
 
   extend type Mutation {
@@ -74,9 +74,9 @@ export const categoryTypeDefs = /* GraphQL */ `
 
 export const categoryResolvers = {
   Query: {
-    getAllCategories: getAllCategoriesQuery,
-    getCategoryById: getCategoryByIdQuery,
-    getCategoriesOverview: getCategoriesOverviewQuery
+    categories: getAllCategoriesQuery,
+    category: getCategoryByIdQuery,
+    categoriesOverview: getCategoriesOverviewQuery
   },
   Mutation: {
     createCategory: createCategoryMutation,

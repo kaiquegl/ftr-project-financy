@@ -13,7 +13,7 @@ import { isUnauthenticatedError } from "@/lib/graphql/errors";
 const getAllCategoriesGQL = gql`
   ${categorySelectionGQL}
   query GetAllCategories {
-    getAllCategories {
+    categories {
       ...CategorySelection
     }
   }
@@ -22,7 +22,7 @@ const getAllCategoriesGQL = gql`
 const getCategoryByIdGQL = gql`
   ${categorySelectionGQL}
   query GetCategoryById($id: String!) {
-    getCategoryById(id: $id) {
+    category(id: $id) {
       ...CategorySelection
     }
   }
@@ -31,7 +31,7 @@ const getCategoryByIdGQL = gql`
 const getCategoriesOverviewGQL = gql`
   ${categorySelectionGQL}
   query GetCategoriesOverview {
-    getCategoriesOverview {
+    categoriesOverview {
       totalCategories
       totalTransactions
       mostUsedCategory {
@@ -43,8 +43,8 @@ const getCategoriesOverviewGQL = gql`
 
 async function fetchAllCategories(): Promise<CategoryItem[]> {
   try {
-    const response = await graphqlClient.request<{ getAllCategories: CategoryItem[] }>(getAllCategoriesGQL);
-    return categoryItemSchema.array().parse(response.getAllCategories);
+    const response = await graphqlClient.request<{ categories: CategoryItem[] }>(getAllCategoriesGQL);
+    return categoryItemSchema.array().parse(response.categories);
   } catch (error) {
     if (isUnauthenticatedError(error)) {
       return [];
@@ -56,12 +56,12 @@ async function fetchAllCategories(): Promise<CategoryItem[]> {
 
 async function fetchCategoryById(id: string): Promise<CategoryItem | null> {
   try {
-    const response = await graphqlClient.request<{ getCategoryById: CategoryItem | null }>(getCategoryByIdGQL, { id });
-    if (!response.getCategoryById) {
+    const response = await graphqlClient.request<{ category: CategoryItem | null }>(getCategoryByIdGQL, { id });
+    if (!response.category) {
       return null;
     }
 
-    return categoryItemSchema.parse(response.getCategoryById);
+    return categoryItemSchema.parse(response.category);
   } catch (error) {
     if (isUnauthenticatedError(error)) {
       return null;
@@ -73,8 +73,8 @@ async function fetchCategoryById(id: string): Promise<CategoryItem | null> {
 
 async function fetchCategoriesOverview(): Promise<CategoryOverview | null> {
   try {
-    const response = await graphqlClient.request<{ getCategoriesOverview: CategoryOverview }>(getCategoriesOverviewGQL);
-    return categoryOverviewSchema.parse(response.getCategoriesOverview);
+    const response = await graphqlClient.request<{ categoriesOverview: CategoryOverview }>(getCategoriesOverviewGQL);
+    return categoryOverviewSchema.parse(response.categoriesOverview);
   } catch (error) {
     if (isUnauthenticatedError(error)) {
       return null;
