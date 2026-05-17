@@ -146,8 +146,3 @@ Aplicação disponível em: `http://localhost:5173`
 
 - `npm run check` - checa padrões com Ultracite
 - `npm run fix` - corrige padrões com Ultracite
-
-## Status atual
-
-- Módulos de autenticação, categorias e transações entregues e integrados entre front-end e back-end.
-- Dashboard inicial presente (`/_dash`) como base para evolução das próximas entregas.
