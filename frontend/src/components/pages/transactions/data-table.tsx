@@ -16,6 +16,8 @@ import type { TransactionItem, TransactionsPage } from "@/lib/graphql/transactio
 type TransactionsDataTableProps = {
   data: TransactionsPage;
   onEditTransaction: (transaction: TransactionItem) => void;
+  onDeleteTransaction: (transaction: TransactionItem) => Promise<void>;
+  isDeletingTransaction: boolean;
   onPageChange: (page: number) => void;
 };
 
@@ -24,7 +26,13 @@ function getVisiblePages(currentPage: number, totalPages: number): number[] {
   return [...pagesToRender].filter((page) => page >= 1 && page <= totalPages).sort((pageA, pageB) => pageA - pageB);
 }
 
-export function TransactionsDataTable({ data, onEditTransaction, onPageChange }: TransactionsDataTableProps) {
+export function TransactionsDataTable({
+  data,
+  onDeleteTransaction,
+  onEditTransaction,
+  isDeletingTransaction,
+  onPageChange
+}: TransactionsDataTableProps) {
   const totalItems = data.totalItems;
   const currentPage = Math.max(1, Math.min(data.page, Math.max(1, data.totalPages)));
   const visiblePages = getVisiblePages(currentPage, Math.max(1, data.totalPages));
@@ -32,7 +40,11 @@ export function TransactionsDataTable({ data, onEditTransaction, onPageChange }:
   const endItem = totalItems > 0 ? Math.min(currentPage * data.perPage, totalItems) : 0;
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < data.totalPages;
-  const transactionsColumns = getTransactionsColumns({ onEditTransaction });
+  const transactionsColumns = getTransactionsColumns({
+    onDeleteTransaction,
+    onEditTransaction,
+    isDeletingTransaction
+  });
 
   const table = useReactTable({
     data: data.items,

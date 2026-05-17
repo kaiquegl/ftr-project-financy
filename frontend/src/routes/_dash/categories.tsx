@@ -1,15 +1,18 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpDownIcon, PlusIcon, TagIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Container } from "@/components/container";
 import { CategoriesCardHeader } from "@/components/pages/categories/card-header";
 import { CategoriesCardItem } from "@/components/pages/categories/card-item";
 import { CategoriesModal } from "@/components/pages/categories/modal";
 import { Button } from "@/components/ui/button";
 import { getCategoryIconByToken, getCategoryIconColorClass } from "@/lib/graphql/categories/helpers";
+import { deleteCategoryMutation } from "@/lib/graphql/categories/mutations";
 import { getAllCategoriesQueryOptions, getCategoriesOverviewQueryOptions } from "@/lib/graphql/categories/queries";
 import type { CategoryItem } from "@/lib/graphql/categories/schemas";
+import { getGraphQLErrorMessage } from "@/lib/graphql/errors";
 
 export const Route = createFileRoute("/_dash/categories")({
   component: RouteComponent,
@@ -22,8 +25,10 @@ export const Route = createFileRoute("/_dash/categories")({
 });
 
 function RouteComponent() {
+  const queryClient = useQueryClient();
   const { data: categories } = useSuspenseQuery(getAllCategoriesQueryOptions());
   const { data: categoriesOverview } = useSuspenseQuery(getCategoriesOverviewQueryOptions());
+  const { mutateAsync: deleteCategory, isPending: isDeletingCategory } = deleteCategoryMutation();
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryItem | undefined>(undefined);
   const mostUsedCategory = categoriesOverview?.mostUsedCategory;
@@ -44,6 +49,20 @@ function RouteComponent() {
     setIsCategoryModalOpen(open);
     if (!open) {
       setSelectedCategory(undefined);
+    }
+  }
+
+  async function onDeleteCategory(category: CategoryItem) {
+    try {
+      await deleteCategory(category.id);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["categories"] }),
+        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      ]);
+      toast.success("Categoria excluida com sucesso.");
+    } catch (error) {
+      toast.error(getGraphQLErrorMessage(error, "Nao foi possivel excluir a categoria."));
     }
   }
 
@@ -81,7 +100,13 @@ function RouteComponent() {
 
         <div className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {categories.map((category) => (
-            <CategoriesCardItem category={category} key={category.id} onEdit={onOpenEditCategoryModal} />
+            <CategoriesCardItem
+              category={category}
+              isDeleting={isDeletingCategory}
+              key={category.id}
+              onDelete={onDeleteCategory}
+              onEdit={onOpenEditCategoryModal}
+            />
           ))}
         </div>
       </Container>

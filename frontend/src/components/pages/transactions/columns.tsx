@@ -1,14 +1,28 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { SquarePenIcon, TrashIcon } from "lucide-react";
+import { useState } from "react";
 import { CategoriesIconBadge } from "@/components/pages/categories/icon-badge";
 import { CategoriesNameBadge } from "@/components/pages/categories/name-badge";
 import { TransactionsTypeBadge } from "@/components/pages/transactions/type-badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { formatCurrencyToBr, formatDateToShortBr } from "@/lib/formatters";
 import type { TransactionItem } from "@/lib/graphql/transactions/schemas";
 
 type GetTransactionsColumnsInput = {
   onEditTransaction: (transaction: TransactionItem) => void;
+  onDeleteTransaction: (transaction: TransactionItem) => Promise<void>;
+  isDeletingTransaction: boolean;
 };
 
 function getAmountLabel(transaction: TransactionItem): string {
@@ -18,7 +32,9 @@ function getAmountLabel(transaction: TransactionItem): string {
 }
 
 export function getTransactionsColumns({
-  onEditTransaction
+  onDeleteTransaction,
+  onEditTransaction,
+  isDeletingTransaction
 }: GetTransactionsColumnsInput): ColumnDef<TransactionItem>[] {
   return [
     {
@@ -72,9 +88,11 @@ export function getTransactionsColumns({
       header: () => <div className="flex items-center justify-end">Ações</div>,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-2">
-          <Button size="icon" variant="outline">
-            <TrashIcon className="text-danger" />
-          </Button>
+          <DeleteTransactionAction
+            isDeletingTransaction={isDeletingTransaction}
+            onDeleteTransaction={onDeleteTransaction}
+            transaction={row.original}
+          />
           <Button onClick={() => onEditTransaction(row.original)} size="icon" variant="outline">
             <SquarePenIcon />
           </Button>
@@ -82,4 +100,49 @@ export function getTransactionsColumns({
       )
     }
   ];
+}
+
+type DeleteTransactionActionProps = {
+  transaction: TransactionItem;
+  onDeleteTransaction: (transaction: TransactionItem) => Promise<void>;
+  isDeletingTransaction: boolean;
+};
+
+function DeleteTransactionAction({
+  transaction,
+  onDeleteTransaction,
+  isDeletingTransaction
+}: DeleteTransactionActionProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  async function onConfirmDelete() {
+    await onDeleteTransaction(transaction);
+    setIsDeleteDialogOpen(false);
+  }
+
+  return (
+    <AlertDialog onOpenChange={setIsDeleteDialogOpen} open={isDeleteDialogOpen}>
+      <AlertDialogTrigger
+        render={
+          <Button disabled={isDeletingTransaction} size="icon" variant="outline">
+            <TrashIcon className="text-danger" />
+          </Button>
+        }
+      />
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir transacao?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Essa acao remove a transacao <strong>{transaction.description}</strong> e nao pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeletingTransaction}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction isLoading={isDeletingTransaction} onClick={onConfirmDelete}>
+            Excluir
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }

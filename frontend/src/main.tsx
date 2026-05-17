@@ -41,7 +41,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <AppRouter />
-        <Toaster position="bottom-center" />
+        <Toaster position="bottom-center" richColors />
         {import.meta.env.DEV && <ReactQueryDevtools />}
       </QueryClientProvider>
     </StrictMode>
